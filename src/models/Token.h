@@ -78,3 +78,4 @@ std::string tokenCategoryToString(TokenType type);
  * @brief Returns an explanatory description for the token (used in the UI details column).
  */
 std::string tokenDescription(TokenType type, const std::string& lexeme);
+

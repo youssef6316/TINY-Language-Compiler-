@@ -265,3 +265,4 @@ std::vector<Token> Scanner::tokenizeAll(bool includeEndfile) {
 
     return tokens;
 }
+

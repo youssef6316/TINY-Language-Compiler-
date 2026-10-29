@@ -82,3 +82,4 @@ private:
     std::unordered_map<std::string, TokenType> m_reservedWords;
     void initReservedWords();
 };
+

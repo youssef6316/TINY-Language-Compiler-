@@ -94,3 +94,4 @@ std::string tokenDescription(TokenType type, const std::string& lexeme) {
         default:                      return "Undefined Token";
     }
 }
+
