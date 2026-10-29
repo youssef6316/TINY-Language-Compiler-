@@ -1,6 +1,5 @@
 # TINY Language Lexical Analyzer Studio
 
-[![Build Standalone Windows Executable](https://github.com/youssef-osama11/TINY-Language-Compiler/actions/workflows/build_windows.yml/badge.svg)](https://github.com/youssef-osama11/TINY-Language-Compiler/actions/workflows/build_windows.yml)
 [![Language](https://img.shields.io/badge/Language-C%2B%2B17-00599C?logo=c%2B%2B)](https://en.cppreference.com/w/cpp/17)
 [![Framework](https://img.shields.io/badge/GUI-Qt%206%20%2F%20Qt%205-41CD52?logo=qt)](https://www.qt.io/)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20(Standalone%20.exe)-0078D6?logo=windows)](https://github.com)
