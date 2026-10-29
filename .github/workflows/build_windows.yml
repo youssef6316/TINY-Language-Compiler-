@@ -1,12 +1,10 @@
-name: Build Standalone Windows Executable
+name: Build TINY Language Scanner Windows Executable
 
 on:
   push:
-    branches: [ "**" ]
-    tags: [ "v*" ]
+    branches: [ main, master ]
   pull_request:
-    branches: [ "**" ]
-  workflow_dispatch:
+    branches: [ main, master ]
 
 jobs:
   build-windows:
@@ -17,68 +15,26 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up MSVC Developer Command Prompt
-        uses: ilammy/msvc-dev-cmd@v1
-
-      - name: Install Ninja
-        run: choco install ninja -y
-
-      - name: Install Qt
-        uses: jurplel/install-qt-action@v3
+      # 1. Set up MSYS2 UCRT64 environment (used locally)
+      - name: Set up MSYS2 UCRT64
+        uses: msys2/setup-msys2@v2
         with:
-          version: '6.6.0'
-          host: 'windows'
-          target: 'desktop'
-          arch: 'win64_mingw'
-          modules: 'qtbase'
-          tools: 'tools_cmake,tools_ninja'
+          msystem: UCRT64
+          update: true
+          install: >-
+            mingw-w64-ucrt-x86_64-toolchain
+            mingw-w64-ucrt-x86_64-cmake
+            mingw-w64-ucrt-x86_64-ninja
+            mingw-w64-ucrt-x86_64-qt6-base
 
-      - name: Configure CMake
+      # 2. Configure, Build, and Run Tests inside the UCRT64 shell
+      - name: Build and Test with CMake & Ninja
+        shell: msys2 {0}
         run: |
-          cmake -B build -G "Ninja" `
-            -DCMAKE_BUILD_TYPE=Release `
-            -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }}"
-
-      - name: Build Project
-        run: cmake --build build --config Release
-
-      - name: Run Unit Tests
-        run: |
+          mkdir build
           cd build
-          ctest --output-on-failure -C Release
-
-      - name: Package Standalone Windows Executable with windeployqt
-        shell: pwsh
-        run: |
-          # Create staging release folder
-          New-Item -ItemType Directory -Force -Path dist/TINYScanner
-
-          # Copy executable
-          Copy-Item build/TINYScanner.exe dist/TINYScanner/
-
-          # Copy sample test assets and documentation
-          Copy-Item -Recurse assets dist/TINYScanner/assets
-          Copy-Item README.md dist/TINYScanner/
-          Copy-Item LICENSE dist/TINYScanner/
-
-          # Run windeployqt to copy Qt DLLs, plugins, and platforms
-          windeployqt --release --no-translations --compiler-runtime dist/TINYScanner/TINYScanner.exe
-
-          # Create zip archive
-          Compress-Archive -Path dist/TINYScanner/* -DestinationPath dist/TINY-Lexical-Analyzer-Windows-x64.zip
-
-      - name: Upload Standalone Windows Executable Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: TINY-Lexical-Analyzer-Windows-x64
-          path: dist/TINY-Lexical-Analyzer-Windows-x64.zip
-          retention-days: 30
-
-      - name: Publish Release Asset (on tag)
-        if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v2
-        with:
-          files: dist/TINY-Lexical-Analyzer-Windows-x64.zip
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+          cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release ..
+          cmake --build .
+          
+          # Run the unit tests automatically on CI
+          ./ScannerUnitTests.exe
