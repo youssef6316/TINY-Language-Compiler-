@@ -1,0 +1,11 @@
+{ Sample 2: Lexical errors and invalid characters }
+read x;
+if x < 0 then
+  write 0;
+else
+  write x;
+end;
+@ // invalid test token '@'
+y := : 50; // invalid operator ':' without '='
+$result := 100 #; // invalid symbols '$' and '#'
+

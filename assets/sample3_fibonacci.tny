@@ -1,0 +1,13 @@
+{ Sample 3: Fibonacci Series in TINY Language }
+read n;
+a := 0;
+b := 1;
+count := 0;
+repeat
+  write a;
+  c := a + b;
+  a := b;
+  b := c;
+  count := count + 1
+until count = n
+
