@@ -383,3 +383,4 @@ QColor Theme::getTokenColor(TokenType type) {
             return QColor(COLOR_TOKEN_ERROR);
     }
 }
+

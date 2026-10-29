@@ -62,3 +62,4 @@ void MainController::scanSource(const QString &sourceCode,
     std::chrono::duration<double, std::milli> elapsed = end - start;
     outElapsedMs = elapsed.count();
 }
+

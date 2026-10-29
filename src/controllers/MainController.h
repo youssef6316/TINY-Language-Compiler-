@@ -33,3 +33,4 @@ public:
                     int &outErrorCount,
                     double &outElapsedMs);
 };
+
