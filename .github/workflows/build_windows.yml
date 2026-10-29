@@ -1,4 +1,4 @@
-name: Build TINY Language Scanner Windows Executable
+name: Build and Release TINY Scanner Windows Executable
 
 on:
   push:
@@ -6,9 +6,13 @@ on:
   pull_request:
     branches: [ main, master ]
 
+# Required permission to create releases and upload assets
+permissions:
+  contents: write
+
 jobs:
-  build-windows:
-    name: Build Standalone Windows (.exe)
+  build-and-release:
+    name: Build and Release Standalone Windows (.exe)
     runs-on: windows-latest
 
     steps:
@@ -26,6 +30,7 @@ jobs:
             mingw-w64-ucrt-x86_64-cmake
             mingw-w64-ucrt-x86_64-ninja
             mingw-w64-ucrt-x86_64-qt6-base
+            zip
 
       # 2. Configure, Build, and Run Tests inside the UCRT64 shell
       - name: Build and Test with CMake & Ninja
@@ -38,3 +43,33 @@ jobs:
           
           # Run the unit tests automatically on CI
           ./ScannerUnitTests.exe
+
+      # 3. Package Executable, DLLs, and Plugins into a Clean Zip Archive
+      - name: Package Standalone Distribution
+        shell: msys2 {0}
+        run: |
+          mkdir -p dist
+          # Copy main executable
+          cp build/TINYScanner.exe dist/
+          
+          # Use windeployqt6 to bundle Qt DLLs, plugins, and translations automatically
+          /ucrt64/bin/windeployqt6.exe --release dist/TINYScanner.exe
+          
+          # Copy required MSYS2/GCC runtime dependencies
+          cp /ucrt64/bin/libstdc++-6.dll dist/
+          cp /ucrt64/bin/libgcc_s_seh-1.dll dist/
+          cp /ucrt64/bin/libwinpthread-1.dll dist/
+          cp /ucrt64/bin/libdouble-conversion.dll dist/
+          
+          # Zip up the distribution folder
+          cd dist
+          zip -r ../TINYScanner-Windows-x64.zip *
+
+      # 4. Automatically Create Release and Upload Asset
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0-${{ github.run_number }}
+          name: "TINYScanner Release v1.0-${{ github.run_number }}"
+          body: "Automated standalone Windows release for the TINY Language Scanner."
+          files: TINYScanner-Windows-x64.zip
