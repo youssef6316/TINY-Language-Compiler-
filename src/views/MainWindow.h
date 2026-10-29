@@ -93,3 +93,4 @@ private:
     QLabel *m_statusTokensLabel{nullptr};
     QLabel *m_statusErrorsLabel{nullptr};
 };
+

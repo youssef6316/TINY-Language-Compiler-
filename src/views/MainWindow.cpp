@@ -58,26 +58,26 @@ void MainWindow::setupMenuBar() {
 
     // File Menu
     QMenu *fileMenu = menu->addMenu("&File");
-    fileMenu->addAction("Open File...", this, &MainWindow::onOpenFile, QKeySequence::Open);
-    fileMenu->addAction("Export Tokens...", this, &MainWindow::onExportTokens, QKeySequence::Save);
+    fileMenu->addAction("Open File...", QKeySequence::Open, this, &MainWindow::onOpenFile);
+    fileMenu->addAction("Export Tokens...", QKeySequence::Save, this, &MainWindow::onExportTokens);
     fileMenu->addSeparator();
-    fileMenu->addAction("Clear All", this, &MainWindow::onClearAll, QKeySequence("Ctrl+L"));
+    fileMenu->addAction("Clear All", QKeySequence("Ctrl+L"), this, &MainWindow::onClearAll);
     fileMenu->addSeparator();
-    fileMenu->addAction("Exit", this, &QWidget::close, QKeySequence::Quit);
+    fileMenu->addAction("Exit", QKeySequence::Quit, this, &QWidget::close);
 
     // Edit Menu
     QMenu *editMenu = menu->addMenu("&Edit");
-    editMenu->addAction("Undo", m_editor, &QPlainTextEdit::undo, QKeySequence::Undo);
-    editMenu->addAction("Redo", m_editor, &QPlainTextEdit::redo, QKeySequence::Redo);
+    editMenu->addAction("Undo", QKeySequence::Undo, m_editor, &QPlainTextEdit::undo);
+    editMenu->addAction("Redo", QKeySequence::Redo, m_editor, &QPlainTextEdit::redo);
     editMenu->addSeparator();
-    editMenu->addAction("Cut", m_editor, &QPlainTextEdit::cut, QKeySequence::Cut);
-    editMenu->addAction("Copy", m_editor, &QPlainTextEdit::copy, QKeySequence::Copy);
-    editMenu->addAction("Paste", m_editor, &QPlainTextEdit::paste, QKeySequence::Paste);
-    editMenu->addAction("Select All", m_editor, &QPlainTextEdit::selectAll, QKeySequence::SelectAll);
+    editMenu->addAction("Cut", QKeySequence::Cut, m_editor, &QPlainTextEdit::cut);
+    editMenu->addAction("Copy", QKeySequence::Copy, m_editor, &QPlainTextEdit::copy);
+    editMenu->addAction("Paste", QKeySequence::Paste, m_editor, &QPlainTextEdit::paste);
+    editMenu->addAction("Select All", QKeySequence::SelectAll, m_editor, &QPlainTextEdit::selectAll);
 
     // Lexer Menu
     QMenu *lexerMenu = menu->addMenu("&Lexer");
-    lexerMenu->addAction("Scan Code (Run Lexer)", this, &MainWindow::onScanCode, QKeySequence("F5"));
+    lexerMenu->addAction("Scan Code (Run Lexer)", QKeySequence("F5"), this, &MainWindow::onScanCode);
     lexerMenu->addSeparator();
     lexerMenu->addAction("Clear Results", this, &MainWindow::onClearAll);
 

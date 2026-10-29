@@ -166,3 +166,4 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event) {
         ++blockNumber;
     }
 }
+
