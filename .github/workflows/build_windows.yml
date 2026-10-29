@@ -26,11 +26,12 @@ jobs:
       - name: Install Qt
         uses: jurplel/install-qt-action@v3
         with:
-          version: '6.6.3'
+          version: '6.6.0'
           host: 'windows'
           target: 'desktop'
-          arch: 'win64_msvc2019_64'
+          arch: 'win64_mingw'
           modules: 'qtbase'
+          tools: 'tools_cmake,tools_ninja'
 
       - name: Configure CMake
         run: |
