@@ -39,6 +39,7 @@
 *.app
 
 # Build directories
+build_test/
 build/
 Build/
 build-*/
