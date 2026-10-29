@@ -55,11 +55,32 @@ jobs:
           # Use windeployqt6 to bundle Qt DLLs, plugins, and translations automatically
           /ucrt64/bin/windeployqt6.exe --release dist/TINYScanner.exe
           
-          # Copy required MSYS2/GCC runtime dependencies
+          # Copy standard GCC / C++ runtimes
           cp /ucrt64/bin/libstdc++-6.dll dist/
           cp /ucrt64/bin/libgcc_s_seh-1.dll dist/
           cp /ucrt64/bin/libwinpthread-1.dll dist/
           cp /ucrt64/bin/libdouble-conversion.dll dist/
+          
+          # Copy ICU & Internationalization libraries (using wildcards to avoid version mismatches)
+          cp /ucrt64/bin/libicuuc*.dll dist/
+          cp /ucrt64/bin/libicuin*.dll dist/
+          cp /ucrt64/bin/libicudt*.dll dist/
+          
+          # Copy Font shaping, graphics, and text rendering libraries (from your screenshot)
+          cp /ucrt64/bin/libglib-2.0*.dll dist/
+          cp /ucrt64/bin/libharfbuzz*.dll dist/
+          cp /ucrt64/bin/libgraphite2*.dll dist/
+          cp /ucrt64/bin/libbrotlicommon*.dll dist/
+          cp /ucrt64/bin/libbrotlidec*.dll dist/
+          cp /ucrt64/bin/libfreetype*.dll dist/
+          cp /ucrt64/bin/libpng16*.dll dist/
+          cp /ucrt64/bin/libpcre2-8-*.dll dist/
+          cp /ucrt64/bin/libpcre2-16-*.dll dist/
+          cp /ucrt64/bin/libmd4c*.dll dist/
+          cp /ucrt64/bin/libb2*.dll dist/
+          cp /ucrt64/bin/libintl*.dll dist/
+          cp /ucrt64/bin/libiconv*.dll dist/
+          cp /ucrt64/bin/libz*.dll dist/
           
           # Zip up the distribution folder
           cd dist
