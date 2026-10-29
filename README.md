@@ -245,5 +245,5 @@ TINY-Language-Compiler/
 ## Academic & Engineering Credits
 Developed for the **Compiler Design Course (Senior 2)**.
 - **Specification:** Louden, Kenneth C. *Compiler Construction: Principles and Practice*.
-- **Design System:** `TINY Lexical Analyzer Studio` (Google Stitch).
+- **Design System:** `TINY Lexical Analyzer Studio`.
 - **Author:** Senior Engineering Team.
