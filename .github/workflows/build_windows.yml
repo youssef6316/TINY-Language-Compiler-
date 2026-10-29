@@ -55,8 +55,8 @@ jobs:
           # Copy executable
           Copy-Item build/TINYScanner.exe dist/TINYScanner/
 
-          # Copy sample test programs and documentation
-          Copy-Item -Recurse tests/samples dist/TINYScanner/samples
+          # Copy sample test assets and documentation
+          Copy-Item -Recurse assets dist/TINYScanner/assets
           Copy-Item README.md dist/TINYScanner/
           Copy-Item LICENSE dist/TINYScanner/
 

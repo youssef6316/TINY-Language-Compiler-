@@ -6,7 +6,7 @@
 [![Platform](https://img.shields.io/badge/Platform-Windows%20(Standalone%20.exe)-0078D6?logo=windows)](https://github.com)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A high-performance desktop lexical analyzer (scanner) application for the **TINY Programming Language**, engineered in **Modern C++ (C++17)** and **Qt Widgets**. Built in strict accordance with Kenneth C. Louden's compiler construction specifications and the course requirements, featuring a clean **Model-View-Controller (MVC)** architecture, a deterministic finite automaton (DFA) state machine, real-time error diagnostics, and automated standalone Windows executable packaging.
+A professional desktop lexical analyzer (scanner) application for the **TINY Programming Language**, engineered in **Modern C++ (C++17)** and **Qt Widgets**. Built in strict accordance with Kenneth C. Louden's compiler construction specifications and the course requirements, featuring an organized **Model-View-Controller (MVC)** architecture, a deterministic finite automaton (DFA) state machine, real-time error diagnostics, and automated standalone Windows executable packaging.
 
 ---
 
@@ -14,8 +14,11 @@ A high-performance desktop lexical analyzer (scanner) application for the **TINY
 
 The application interface implements the **Developer Minimalism** design system specified in Google Stitch project **`TINY Lexical Analyzer Studio`**:
 
-- **Dark Mode Ergonomics:** Built upon deep charcoal surfaces (`#131313`, `#1E1E1E`, `#202020`) with semantic accent highlights (`#007ACC` primary blue, `#61DAC1` identifier mint, `#F6BB84` literal amber, `#FFB4AB` error red).
+- **Dark Mode Ergonomics:** Built upon deep charcoal surfaces (`#131313`, `#1E1E22`, `#202020`) with semantic accent highlights (`#007ACC` primary blue, `#61DAC1` identifier mint, `#F6BB84` literal amber, `#FFB4AB` error red).
 - **Split-Pane Layout (`QSplitter`):** Dynamically resizable 50/50 split dividing the source code editor from the analysis grid.
+- **Trigger Center (`Scan Code`):** The `Scan Code` hero action button acts as the central execution trigger; loading a file populates the editor without auto-running, giving the user explicit control over when lexical analysis starts.
+- **Alerting Red `Clear` Button:** Highlighted with a distinct red palette (`#381518`, `#78262C` border, `#FFA4A8` text) to clearly signal destructive state clearing.
+- **Prominent `Export Tokens` Button:** Positioned at the top-right corner of the toolbar for immediate one-click file exports.
 - **Monospaced Code Editor (`CodeEditor`):** Custom line-number gutter, active line tracking, and automatic line-jump highlighting for compiler errors.
 - **Structured Token Grid (`QTableWidget`):** Color-coded category chips, lexeme strings, token types, and syntactic descriptions.
 - **Interactive Search Filter:** Real-time filtering across lexemes, categories, and token types.
@@ -25,45 +28,52 @@ The application interface implements the **Developer Minimalism** design system 
 
 ## Architecture Overview (MVC Pattern)
 
-The codebase enforces a separation of concerns through the Model-View-Controller pattern:
+The codebase is organized into dedicated subdirectories separating concerns:
 
 ```mermaid
 flowchart LR
-    subgraph View ["View Layer (Qt Widgets)"]
+    subgraph View ["Views Layer (src/views/)"]
         MW["MainWindow"]
         CE["CodeEditor (Line Numbers)"]
         TW["QTableWidget (Token Stream)"]
         DR["Diagnostics Ribbon"]
     end
 
-    subgraph Controller ["Controller Layer"]
+    subgraph Controller ["Controllers Layer (src/controllers/)"]
         MC["MainController"]
     end
 
-    subgraph Model ["Model Layer (Core Compiler)"]
+    subgraph Model ["Models Layer (src/models/)"]
         SC["Scanner (DFA State Machine)"]
         TK["Token / TokenType"]
     end
 
-    MW -->|Triggers Scan / I/O| MC
+    subgraph Utils ["Utils Layer (src/utils/)"]
+        TH["Theme & Badges"]
+    end
+
+    MW -->|Triggers Scan / File I/O| MC
     MC -->|Runs getToken / tokenizeAll| SC
     SC -->|Generates| TK
     MC -->|Delivers Tokens & Metrics| MW
-    MW -->|Updates| TW
+    MW -->|Populates| TW
     MW -->|Renders Errors| DR
     CE -->|Syncs Line / Col| MW
+    MW -.->|Styles UI| TH
 ```
 
 ### Component Breakdown
-1. **Models Layer (`include/Token.h`, `src/Token.cpp`, `include/Scanner.h`, `src/Scanner.cpp`):**
+1. **Models Layer (`src/models/`):**
    - Pure C++17 without GUI dependencies; can be compiled and verified independently.
-   - `TokenType`: Strongly typed enumeration of all TINY keywords, operators, delimiters, and errors.
-   - `Token`: Data structure encapsulating the lexeme string value, token type, line number, column number, and error descriptions.
-   - `Scanner`: Implements the `getToken()` lexical state machine, whitespace stripping, comment removal (`{ ... }` and `// ...`), and maximal munch lookahead.
-2. **Controllers Layer (`include/MainController.h`, `src/MainController.cpp`):**
-   - Coordinates file streaming, token export formatting, benchmarking (`std::chrono`), and sample preloading.
-3. **Views Layer (`include/MainWindow.h`, `src/MainWindow.cpp`, `include/CodeEditor.h`, `src/CodeEditor.cpp`, `include/Theme.h`, `src/Theme.cpp`):**
-   - Implements the complete desktop GUI, menus, toolbars, line gutter painting, cell badges, and status bar telemetry.
+   - `Token.h` / `Token.cpp`: Strongly typed `TokenType` enum and `Token` structure storing lexeme string values, source positions, and export formatting.
+   - `Scanner.h` / `Scanner.cpp`: Implements the `getToken()` lexical state machine, whitespace stripping, comment removal (`{ ... }` and `// ...`), and maximal munch lookahead.
+2. **Controllers Layer (`src/controllers/`):**
+   - `MainController.h` / `MainController.cpp`: Coordinates file I/O with UTF-8 encoding, token export formatting, and scan benchmarking (`std::chrono`).
+3. **Views Layer (`src/views/`):**
+   - `MainWindow.h` / `MainWindow.cpp`: Desktop GUI, menus, toolbars, split-pane layout, and diagnostics alert ribbon.
+   - `CodeEditor.h` / `CodeEditor.cpp`: Line-number gutter painting, cursor tracking, and error line jumping.
+4. **Utils Layer (`src/utils/`):**
+   - `Theme.h` / `Theme.cpp`: QSS application stylesheet and HTML badge generators for token categories.
 
 ---
 
@@ -106,13 +116,17 @@ The lexical analyzer operates as a Deterministic Finite Automaton with the follo
 
 ---
 
-## File I/O & Export Specifications
+## Input Modes & File I/O Specifications
 
-### 1. Open Source File
-Click **"Open File"** or press `Ctrl+O` to load `.tny` or `.txt` source files directly into the left editor pane using native file dialogs.
+The scanner takes two types of inputs:
+1. **File Input via `QFileDialog`:** Click **"Open File"** or press `Ctrl+O` to load `.tny` or `.txt` source files.
+2. **Direct Code Writing / Copy-Paste:** Directly type or paste TINY code into the left editor pane.
 
-### 2. Export Tokens
-Click **"Export Tokens"** or press `Ctrl+S` to dump the generated token sequence into a text file. As mandated by the project specifications, the output format is:
+### Triggering Analysis
+Click **"Scan Code"** (or press `F5`) to trigger lexical analysis on the loaded or edited source text.
+
+### Exporting Tokens
+Click **"Export Tokens"** (or press `Ctrl+S`) at the top-right toolbar to dump the generated token sequence into a text file in the required format:
 ```text
 <tokenvalue> , <tokentype>
 ```
@@ -143,21 +157,15 @@ This repository includes a production-grade GitHub Actions workflow (`.github/wo
 3. Installs Qt 6.6 via `jurplel/install-qt-action`.
 4. Compiles the project and runs the automated unit test suite (`ctest`).
 5. Invokes `windeployqt` to collect all required Qt shared libraries (`Qt6Core.dll`, `Qt6Gui.dll`, `Qt6Widgets.dll`, `qwindows.dll` platform plugin, styles, etc.).
-6. Packages the standalone executable into **`TINY-Lexical-Analyzer-Windows-x64.zip`**.
+6. Packages the standalone executable and assets into **`TINY-Lexical-Analyzer-Windows-x64.zip`**.
 7. Publishes the zip archive as an artifact downloadable directly from GitHub without needing Qt or C++ development tools installed on your PC.
-
-### How to Download the Standalone `.exe`:
-1. Go to the **Actions** tab of this repository.
-2. Click on the latest workflow run.
-3. Scroll down to the **Artifacts** section.
-4. Download **`TINY-Lexical-Analyzer-Windows-x64.zip`**, extract it, and run `TINYScanner.exe`.
 
 ---
 
 ## Local Build Instructions
 
 ### Prerequisites
-- **Compiler:** MSVC 2019/2022, GCC 9+ (MinGW-w64), or Clang (C++17 support required).
+- **Compiler:** GCC 9+ (MinGW-w64), Clang, or MSVC 2019/2022 (C++17 support required).
 - **Build System:** CMake 3.16 or later.
 - **Framework:** Qt 6 (6.2+) or Qt 5 (5.15+).
 
@@ -171,7 +179,7 @@ cd TINY-Language-Compiler
 mkdir build
 cd build
 
-# Configure with CMake (specify Qt path if not in system PATH)
+# Configure with CMake
 cmake .. -DCMAKE_BUILD_TYPE=Release
 
 # Build executable and unit tests
@@ -180,25 +188,18 @@ cmake --build . --config Release
 
 ### 2. Run the Unit Tests
 ```powershell
-# Execute test suite
 ctest --output-on-failure
 # Or run standalone unit test binary:
 ./ScannerUnitTests
 ```
 
-### 3. Run Standalone Deployment (`windeployqt`)
-```powershell
-# Deploy Qt dependencies next to the executable
-windeployqt --release bin/TINYScanner.exe
-```
-
 ---
 
-## Included Sample Programs
-Three preloaded sample programs are available under `tests/samples/` and directly via the application toolbar:
-1. **`sample1_factorial.tny`:** The classic TINY factorial computation program demonstrating valid keywords, loops, conditions, and arithmetic operators.
-2. **`sample2_invalid.tny`:** Demonstration of invalid characters (`@`, lone `:`, `$`, `#`) triggering the warning ribbon and line navigation.
-3. **`sample3_fibonacci.tny`:** Fibonacci sequence calculation showcasing assignment, loops, and statement delimiters.
+## Testing Assets
+The `/assets` directory contains sample TINY files for manual testing and verification:
+1. **`assets/sample1_factorial.tny`:** Louden's classic factorial algorithm.
+2. **`assets/sample2_invalid.tny`:** Demonstration of invalid characters (`@`, lone `:`, `$`, `#`).
+3. **`assets/sample3_fibonacci.tny`:** Fibonacci series computation in TINY.
 
 ---
 
@@ -208,33 +209,36 @@ Three preloaded sample programs are available under `tests/samples/` and directl
 TINY-Language-Compiler/
 ├── .github/
 │   └── workflows/
-│       └── build_windows.yml      # Automated standalone .exe build & packaging
+│       └── build_windows.yml         # Automated standalone .exe build & packaging
+├── assets/
+│   ├── sample1_factorial.tny         # Sample TINY program for testing
+│   ├── sample2_invalid.tny           # Sample program with lexical errors
+│   └── sample3_fibonacci.tny         # Sample Fibonacci program
 ├── Docs/
 │   └── ScannerProjectDescription.pdf # Course project specifications
-├── include/
-│   ├── Token.h                    # Token structure & TokenType enum
-│   ├── Scanner.h                  # Core DFA lexical analyzer model
-│   ├── MainController.h           # MVC Controller (I/O & metrics)
-│   ├── MainWindow.h               # MVC View (Split-pane layout & dialogs)
-│   ├── CodeEditor.h               # Custom code editor with line gutter
-│   └── Theme.h                    # Stitch design system styling & badges
 ├── src/
-│   ├── main.cpp                   # Application entry point
-│   ├── Token.cpp                  # Token string conversions & export format
-│   ├── Scanner.cpp                # DFA state machine implementation
-│   ├── MainController.cpp         # File I/O & scan execution orchestration
-│   ├── MainWindow.cpp             # GUI layout, slots, table & diagnostics
-│   ├── CodeEditor.cpp             # Line number painting & error highlighting
-│   └── Theme.cpp                  # QSS stylesheet & category badge generator
+│   ├── main.cpp                      # Application entry point
+│   ├── models/
+│   │   ├── Token.h                   # Token structure & TokenType enum
+│   │   ├── Token.cpp                 # Token serialization & export formatting
+│   │   ├── Scanner.h                 # DFA Lexer state machine model
+│   │   └── Scanner.cpp               # getToken() & maximal munch scanner
+│   ├── controllers/
+│   │   ├── MainController.h          # MVC Controller header
+│   │   └── MainController.cpp        # File I/O & scan execution orchestration
+│   ├── views/
+│   │   ├── MainWindow.h              # MVC Main View header
+│   │   ├── MainWindow.cpp            # Split-pane UI layout, slots & diagnostics
+│   │   ├── CodeEditor.h              # Custom editor header with line gutter
+│   │   └── CodeEditor.cpp            # Line numbers & error line jumping
+│   └── utils/
+│       ├── Theme.h                   # Theme styling & badge generator header
+│       └── Theme.cpp                 # QSS dark theme & category color mapping
 ├── tests/
-│   ├── test_scanner.cpp           # Automated C++ unit test suite
-│   └── samples/
-│       ├── sample1_factorial.tny  # Sample TINY program
-│       ├── sample2_invalid.tny    # Sample program with lexical errors
-│       └── sample3_fibonacci.tny  # Sample Fibonacci program
-├── CMakeLists.txt                 # Modern CMake configuration
-├── README.md                      # Comprehensive documentation
-└── LICENSE                        # MIT License
+│   └── test_scanner.cpp              # Automated C++ unit test suite
+├── CMakeLists.txt                    # Modern CMake configuration
+├── README.md                         # Comprehensive documentation
+└── LICENSE                           # MIT License
 ```
 
 ---
@@ -242,5 +246,5 @@ TINY-Language-Compiler/
 ## Academic & Engineering Credits
 Developed for the **Compiler Design Course (Senior 2)**.
 - **Specification:** Louden, Kenneth C. *Compiler Construction: Principles and Practice*.
-- **Design System:** `TINY Lexical Analyzer Studio`.
+- **Design System:** `TINY Lexical Analyzer Studio` (Google Stitch).
 - **Author:** Senior Engineering Team.
