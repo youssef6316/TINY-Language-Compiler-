@@ -1,5 +1,4 @@
 # TINY Language Lexical Analyzer Studio
-
 [![Language](https://img.shields.io/badge/Language-C%2B%2B17-00599C?logo=c%2B%2B)](https://en.cppreference.com/w/cpp/17)
 [![Framework](https://img.shields.io/badge/GUI-Qt%206%20%2F%20Qt%205-41CD52?logo=qt)](https://www.qt.io/)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20(Standalone%20.exe)-0078D6?logo=windows)](https://github.com)
@@ -214,7 +213,8 @@ TINY-Language-Compiler/
 │   ├── sample2_invalid.tny           # Sample program with lexical errors
 │   └── sample3_fibonacci.tny         # Sample Fibonacci program
 ├── Docs/
-│   └── ScannerProjectDescription.pdf # Course project specifications
+│   ├── ScannerProjectDescription.pdf # Course project specifications
+│   └── ProjectDocumentation.pdf      # project documentation
 ├── src/
 │   ├── main.cpp                      # Application entry point
 │   ├── models/
