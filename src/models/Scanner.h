@@ -78,6 +78,7 @@ private:
 
     int m_errorCount{0};
     int m_totalLines{1};
+    bool m_lastReadEOF{false};
 
     std::unordered_map<std::string, TokenType> m_reservedWords;
     void initReservedWords();

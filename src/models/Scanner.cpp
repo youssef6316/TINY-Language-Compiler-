@@ -38,12 +38,15 @@ void Scanner::reset() {
     m_currentLine = 1;
     m_currentCol = 1;
     m_errorCount = 0;
+    m_lastReadEOF = false;
 }
 
 char Scanner::getNextChar() {
     if (m_cursor >= m_source.size()) {
+        m_lastReadEOF = true;
         return '\0';
     }
+    m_lastReadEOF = false;
     char c = m_source[m_cursor++];
     if (c == '\n') {
         m_currentLine++;
@@ -55,7 +58,7 @@ char Scanner::getNextChar() {
 }
 
 void Scanner::ungetNextChar() {
-    if (m_cursor == 0) return;
+    if (m_lastReadEOF || m_cursor == 0) return;
     m_cursor--;
     char c = m_source[m_cursor];
     if (c == '\n') {
@@ -79,11 +82,7 @@ char Scanner::peekNextChar() const {
 }
 
 TokenType Scanner::checkReserved(const std::string& lexeme) const {
-    std::string lower = lexeme;
-    std::transform(lower.begin(), lower.end(), lower.begin(),
-                   [](unsigned char ch) { return std::tolower(ch); });
-
-    auto it = m_reservedWords.find(lower);
+    auto it = m_reservedWords.find(lexeme);
     if (it != m_reservedWords.end()) {
         return it->second;
     }
